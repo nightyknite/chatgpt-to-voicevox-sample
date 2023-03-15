@@ -12,12 +12,12 @@ def answer(request_text, system_text=""):
 
     history = []
     if os.path.isfile(HISTORY_PATH):
-      with open(HISTORY_PATH, 'r') as f:
+      with open(HISTORY_PATH, mode='r') as f:
         history = json.load(f)
-        history.append({"role": "user", "content": request_text})
     else:
       if system_text:
-        history.append({"role": "user", "content": request_text})
+        history.append({"role": "system", "content": system_text})
+    history.append({"role": "user", "content": request_text})
 
     response = openai.ChatCompletion.create(
       model="gpt-3.5-turbo",
@@ -26,9 +26,8 @@ def answer(request_text, system_text=""):
     response_content = response["choices"][0]["message"]["content"]
 
     history.append({"role": "assistant", "content": response_content})
-    with open(HISTORY_PATH, mode="w") as f:
+    with open(HISTORY_PATH, mode='w') as f:
       json.dump(history, f)
-      f.close()
     return response_content
 
 if __name__ == "__main__": 
